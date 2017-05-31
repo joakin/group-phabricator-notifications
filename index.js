@@ -5,7 +5,7 @@ const notifos = Array.from(
 ).map(el => ({
   el,
   task: el.querySelector('.phui-handle:not(.phui-link-person)')
-}));
+})).filter(({task}) => !!task);
 
 const groups = notifos.reduce(
   (gs, n) => {
