@@ -1,34 +1,36 @@
-const notifos = Array.from(
-  document.querySelectorAll(
-    '.phabricator-notification-list .phabricator-notification'
-  )
-).map(el => ({
-  el,
-  task: el.querySelector('.phui-handle:not(.phui-link-person)')
-})).filter(({task}) => !!task);
+const selectors = {
+  notifoList: '.phabricator-notification-list',
+  notifos: '.phabricator-notification-list .phabricator-notification',
+  taskInNotifo: '.phui-handle:not(.phui-link-person)'
+};
 
-const groups = notifos.reduce(
-  (gs, n) => {
-    let key = n.task.href;
-    gs[key] = gs[key] || {
-      title: n.task.textContent,
-      href: key,
-      children: []
-    };
-    gs[key].children.push(n);
-    return gs;
-  },
-  {}
-);
+const notifos = Array.from(document.querySelectorAll(selectors.notifos))
+  .map(el => ({
+    el,
+    task: el.querySelector(selectors.taskInNotifo)
+  }))
+  .filter(({ task }) => !!task);
 
-const notifoList = document.querySelector('.phabricator-notification-list');
+const groups = notifos.reduce((gs, n) => {
+  let key = n.task.href;
+  gs[key] = gs[key] || {
+    title: n.task.textContent,
+    href: key,
+    children: []
+  };
+  gs[key].children.push(n);
+  return gs;
+}, {});
 
-notifoList.innerHTML = '';
+const notifoList = document.querySelector(selectors.notifoList);
+const groupedNotifos = document.createElement('div');
 
 Object.keys(groups).forEach((k, i) => {
   let group = groups[k];
-  notifoList.appendChild(renderGroup(group, i));
+  groupedNotifos.appendChild(renderGroup(group, i));
 });
+
+notifoList.appendChild(groupedNotifos);
 
 function renderGroup(group, i) {
   const container = document.createElement('div');
@@ -69,7 +71,7 @@ function renderGroup(group, i) {
     }
   });
 
-  group.children.forEach(n => grouped.appendChild(n.el.cloneNode(true)));
+  group.children.forEach(n => grouped.appendChild(n.el));
 
   return container;
 }
