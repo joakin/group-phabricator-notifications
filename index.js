@@ -16,6 +16,7 @@ const groups = notifos.reduce((gs, n) => {
   gs[key] = gs[key] || {
     title: n.task.textContent,
     href: key,
+    class: n.task.className,
     children: []
   };
   gs[key].children.push(n);
@@ -42,7 +43,7 @@ function renderGroup(group, i) {
         <span class="read visual-only phui-icon-view phui-font-fa fa-eye-slash" aria-hidden="true" style='cursor:pointer'></span>
         <span class='toggle' style='min-width: 50px; text-align: right; display: inline-block; cursor: pointer; font-weight: bold;'>${group.children.length} <span>◀︎</span></span>
       </span>
-      <a href='${group.href}'></a>
+      <a href='${group.href}' class='${group.class}'></a>
     </h3>
     <div class='grouped-notifos' style='display: none; font-size: 0.8em;'>
     </div>
