@@ -1,0 +1,3 @@
+#!/bin/bash
+
+zip -vr dist.zip ./* -x "*.DS_Store" -x "build"
