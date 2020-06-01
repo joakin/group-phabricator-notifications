@@ -25,12 +25,31 @@ const groups = notifos.reduce((gs, n) => {
 
 const notifoList = document.querySelector(selectors.notifoList);
 const groupedNotifos = document.createElement('div');
+const toggles = [];
 
 Object.keys(groups).forEach((k, i) => {
   let group = groups[k];
   groupedNotifos.appendChild(renderGroup(group, i));
 });
 
+function clickIfLabel(label) {
+  toggles.forEach((toggle) => {
+    const toggleIcon = toggle.querySelector('span');
+    if (toggleIcon.textContent === label) toggle.click();
+  });
+}
+
+const buttons = document.createElement('div');
+buttons.innerHTML = `
+  <div style="text-align: right; padding: 5px 0;">
+    <a class="expand">Expand all</a> | <a class="collapse">Collapse all</a>
+  </div>
+`;
+
+buttons.querySelector('.expand').addEventListener('click', () => { clickIfLabel('◀︎'); });
+buttons.querySelector('.collapse').addEventListener('click', () => { clickIfLabel('▼'); });
+
+notifoList.appendChild(buttons);
 notifoList.appendChild(groupedNotifos);
 
 function renderGroup(group, i) {
@@ -71,6 +90,7 @@ function renderGroup(group, i) {
       grouped.style.display = 'none';
     }
   });
+  toggles.push(toggle);
 
   group.children.forEach(n => grouped.appendChild(n.el));
 
