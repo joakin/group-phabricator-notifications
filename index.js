@@ -6,6 +6,7 @@ const selectors = {
     ".phui-header-shell.phui-profile-header .phui-header-action-links",
 };
 const collapsedIcon = "◀︎";
+const collapsedUpIcon = "▲";
 const expandedIcon = "▼";
 
 // Notifications list modifications
@@ -91,10 +92,12 @@ const buttonClasses =
 const expandClass = "expand-all-button";
 const collapseClass = "collapse-all-button";
 const expandCollapseButtonsHtml = `
-    <a class="${expandClass} ${buttonClasses}">Expand all</a>
-    <a class="${collapseClass} ${buttonClasses}">Collapse all</a>
+    <a class="${expandClass} ${buttonClasses}">${expandedIcon} Expand all</a>
+    <a class="${collapseClass} ${buttonClasses}">${collapsedUpIcon} Collapse all</a>
   `;
-buttonsInHeader.innerHTML += expandCollapseButtonsHtml;
+// Prepend the buttons because they are floated right for some reason...
+buttonsInHeader.innerHTML =
+  expandCollapseButtonsHtml + buttonsInHeader.innerHTML;
 
 const toggles = Array.from(notifoList.querySelectorAll(".toggle"));
 
