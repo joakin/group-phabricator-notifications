@@ -1,13 +1,19 @@
 const selectors = {
-  notifoList: '.phabricator-notification-list',
-  notifos: '.phabricator-notification-list .phabricator-notification',
-  taskInNotifo: '.phui-handle:not(.phui-link-person)'
+  notifoList: ".phabricator-notification-list",
+  notifos: ".phabricator-notification-list .phabricator-notification",
+  taskInNotifo: ".phui-handle:not(.phui-link-person)",
+  buttonsInHeader:
+    ".phui-header-shell.phui-profile-header .phui-header-action-links",
 };
+const collapsedIcon = "◀︎";
+const expandedIcon = "▼";
+
+// Notifications list modifications
 
 const notifos = Array.from(document.querySelectorAll(selectors.notifos))
-  .map(el => ({
+  .map((el) => ({
     el,
-    task: el.querySelector(selectors.taskInNotifo)
+    task: el.querySelector(selectors.taskInNotifo),
   }))
   .filter(({ task }) => !!task);
 
@@ -17,14 +23,14 @@ const groups = notifos.reduce((gs, n) => {
     title: n.task.textContent,
     href: key,
     class: n.task.className,
-    children: []
+    children: [],
   };
   gs[key].children.push(n);
   return gs;
 }, {});
 
 const notifoList = document.querySelector(selectors.notifoList);
-const groupedNotifos = document.createElement('div');
+const groupedNotifos = document.createElement("div");
 
 Object.keys(groups).forEach((k, i) => {
   let group = groups[k];
@@ -34,9 +40,9 @@ Object.keys(groups).forEach((k, i) => {
 notifoList.appendChild(groupedNotifos);
 
 function renderGroup(group, i) {
-  const container = document.createElement('div');
-  container.style.padding = '0.5em 1em';
-  if (i % 2 == 0) container.style.backgroundColor = '#f5f5f5';
+  const container = document.createElement("div");
+  container.style.padding = "0.5em 1em";
+  if (i % 2 == 0) container.style.backgroundColor = "#f5f5f5";
   container.innerHTML = `
     <h3 class='phui-header-header'>
       <span style='float: right;'>
@@ -49,30 +55,59 @@ function renderGroup(group, i) {
     </div>
   `;
   // Set title as text content to avoid html injection
-  container.querySelector('h3>a').textContent = group.title;
+  container.querySelector("h3>a").textContent = group.title;
 
-  const toggle = container.querySelector('.toggle');
-  const toggleIcon = toggle.querySelector('span');
-  const read = container.querySelector('.read');
-  const grouped = container.querySelector('.grouped-notifos');
+  const toggle = container.querySelector(".toggle");
+  const toggleIcon = toggle.querySelector("span");
+  const read = container.querySelector(".read");
+  const grouped = container.querySelector(".grouped-notifos");
 
-  read.addEventListener('click', () => {
-    const i = document.createElement('img');
+  read.addEventListener("click", () => {
+    const i = document.createElement("img");
     i.src = group.href;
     container.remove();
   });
 
-  toggle.addEventListener('click', () => {
-    if (toggleIcon.textContent === '◀︎') {
-      toggleIcon.textContent = '▼';
-      grouped.style.display = 'block';
+  toggle.addEventListener("click", () => {
+    if (toggleIcon.textContent === collapsedIcon) {
+      toggleIcon.textContent = expandedIcon;
+      grouped.style.display = "block";
     } else {
-      toggleIcon.textContent = '◀︎';
-      grouped.style.display = 'none';
+      toggleIcon.textContent = collapsedIcon;
+      grouped.style.display = "none";
     }
   });
 
-  group.children.forEach(n => grouped.appendChild(n.el));
+  group.children.forEach((n) => grouped.appendChild(n.el));
 
   return container;
 }
+
+// Expand collapse buttons in header
+
+const buttonsInHeader = document.querySelector(selectors.buttonsInHeader);
+const buttonClasses =
+  "button button-grey has-icon has-text phui-button-default msl phui-header-action-link";
+const expandClass = "expand-all-button";
+const collapseClass = "collapse-all-button";
+const expandCollapseButtonsHtml = `
+    <a class="${expandClass} ${buttonClasses}">Expand all</a>
+    <a class="${collapseClass} ${buttonClasses}">Collapse all</a>
+  `;
+buttonsInHeader.innerHTML += expandCollapseButtonsHtml;
+
+const toggles = Array.from(notifoList.querySelectorAll(".toggle"));
+
+const expandCollapseHandler = (label) => (event) => {
+  toggles.forEach((toggle) => {
+    const toggleIcon = toggle.querySelector("span");
+    if (toggleIcon.textContent === label) toggle.click();
+  });
+};
+
+buttonsInHeader
+  .querySelector(`.${expandClass}`)
+  .addEventListener("click", expandCollapseHandler(collapsedIcon));
+buttonsInHeader
+  .querySelector(`.${collapseClass}`)
+  .addEventListener("click", expandCollapseHandler(expandedIcon));
